@@ -12,7 +12,7 @@ The `Build native apps` workflow produces:
 - Linux x64 AppImage, RPM, and DEB packages
 - Android installable debug APK
 
-Run the workflow manually from the Actions tab, or push a tag such as `v2.2.0`.
+The workflow runs on every push to `main`, can be started manually from the Actions tab, and also runs for tags such as `v2.2.0`.
 
 ## Local development
 

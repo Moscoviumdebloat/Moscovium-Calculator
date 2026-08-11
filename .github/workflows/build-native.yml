@@ -3,8 +3,14 @@ name: Build native apps
 on:
   workflow_dispatch:
   push:
+    branches:
+      - main
     tags:
       - "v*"
+
+concurrency:
+  group: native-build-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
@@ -50,8 +56,6 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
       - run: npm ci
-      - run: python3 -m pip install --disable-pip-version-check Pillow
-      - run: python3 scripts/generate-platform-icons.py
       - run: npm run desktop:renderer
       - name: Build macOS app
         run: npx electron-builder --project desktop --mac dmg zip --${{ matrix.arch }} --publish never
@@ -76,9 +80,7 @@ jobs:
       - name: Install Linux packaging tools
         run: |
           sudo apt-get update
-          sudo apt-get install --no-install-recommends -y rpm
-      - run: python3 -m pip install --disable-pip-version-check Pillow
-      - run: python3 scripts/generate-platform-icons.py
+          sudo apt-get install --no-install-recommends -y libopenjp2-tools rpm
       - run: npm run desktop:renderer
       - name: Build Linux packages
         run: npx electron-builder --project desktop --linux AppImage deb rpm --x64 --publish never
@@ -109,11 +111,11 @@ jobs:
         run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
       - run: npm ci
       - run: npm run android:sync
-      - run: python3 -m pip install --disable-pip-version-check Pillow
-      - run: python3 scripts/generate-platform-icons.py
       - name: Build installable APK
         working-directory: android
-        run: ./gradlew assembleDebug --no-daemon
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
       - name: Give the APK a useful name
         run: |
           mkdir -p release
