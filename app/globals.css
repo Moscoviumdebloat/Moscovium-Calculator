@@ -1,0 +1,239 @@
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  min-height: 100%;
+  margin: 0;
+}
+
+body {
+  overflow-x: hidden;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+.app-shell {
+  min-height: 100vh;
+  min-height: 100svh;
+  padding: 24px;
+  background:
+    radial-gradient(circle at 15% 10%, color-mix(in srgb, var(--mui-palette-primary-main) 10%, transparent), transparent 28rem),
+    var(--mui-palette-background-default);
+}
+
+.app-header {
+  width: min(930px, 100%);
+  margin: 0 auto 24px;
+}
+
+.element-mark {
+  position: relative;
+  display: grid;
+  width: 50px;
+  height: 50px;
+  place-items: center;
+  border-radius: 15px;
+  color: var(--mui-palette-primary-contrastText);
+  background: var(--mui-palette-primary-main);
+  box-shadow: 0 8px 22px color-mix(in srgb, var(--mui-palette-primary-main) 28%, transparent);
+}
+
+.element-mark span {
+  position: absolute;
+  top: 5px;
+  left: 8px;
+  font-size: 0.54rem;
+  font-weight: 700;
+  opacity: 0.78;
+}
+
+.element-mark strong {
+  margin-top: 6px;
+  font-size: 1.25rem;
+  letter-spacing: -0.04em;
+}
+
+.workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 570px) minmax(235px, 285px);
+  gap: 22px;
+  width: min(880px, 100%);
+  margin: 0 auto;
+  align-items: stretch;
+}
+
+.calculator,
+.history-panel {
+  border: 1px solid var(--mui-palette-divider);
+  box-shadow: 0 20px 55px color-mix(in srgb, #000 10%, transparent) !important;
+}
+
+.calculator {
+  padding: 20px;
+  border-radius: 30px !important;
+}
+
+.display {
+  display: flex;
+  min-height: 140px;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: flex-end;
+  padding: 14px 10px 20px;
+  overflow: hidden;
+}
+
+.formula {
+  min-height: 24px;
+  max-width: 100%;
+  overflow: hidden;
+  font-size: 0.95rem !important;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.result {
+  max-width: 100%;
+  overflow: hidden;
+  font-size: clamp(2.8rem, 9vw, 4.5rem) !important;
+  font-weight: 520 !important;
+  line-height: 1.08 !important;
+  letter-spacing: -0.055em !important;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.keypad {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.keypad .MuiButton-root {
+  color: var(--mui-palette-text-primary);
+  background: var(--mui-palette-action-hover);
+}
+
+.keypad .MuiButton-root:hover {
+  background: color-mix(in srgb, var(--mui-palette-primary-main) 15%, var(--mui-palette-action-hover));
+}
+
+.keypad .utility-key {
+  color: var(--mui-palette-primary-main);
+  background: color-mix(in srgb, var(--mui-palette-primary-main) 10%, transparent);
+}
+
+.keypad .operator-key {
+  color: var(--mui-palette-primary-main);
+  background: color-mix(in srgb, var(--mui-palette-primary-main) 14%, transparent);
+  font-size: 1.45rem;
+}
+
+.keypad .equals-key,
+.keypad .equals-key:hover {
+  color: var(--mui-palette-primary-contrastText);
+  background: var(--mui-palette-primary-main);
+}
+
+.zero-key {
+  grid-column: span 2;
+}
+
+.shortcut-row {
+  min-height: 40px;
+  padding: 10px 6px 0 10px;
+}
+
+.history-panel {
+  min-height: 100%;
+  padding: 20px;
+  border-radius: 28px !important;
+}
+
+.empty-history {
+  min-height: 360px;
+  padding: 24px;
+  color: var(--mui-palette-text-disabled);
+}
+
+.history-item {
+  display: flex !important;
+  min-height: 70px;
+  flex-direction: column !important;
+  align-items: flex-end !important;
+  padding: 11px 14px !important;
+  border-radius: 14px !important;
+  color: var(--mui-palette-text-primary) !important;
+  background: var(--mui-palette-action-hover) !important;
+}
+
+.history-item span {
+  color: var(--mui-palette-text-secondary);
+  font-size: 0.76rem;
+  font-weight: 500;
+}
+
+.history-item strong {
+  max-width: 100%;
+  overflow: hidden;
+  font-size: 1.15rem;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 720px) {
+  .app-shell {
+    padding: 16px 14px 28px;
+  }
+
+  .app-header {
+    margin-bottom: 16px;
+  }
+
+  .workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .calculator {
+    padding: 14px;
+    border-radius: 26px !important;
+  }
+
+  .display {
+    min-height: 128px;
+  }
+
+  .history-panel {
+    min-height: auto;
+  }
+
+  .empty-history {
+    min-height: 120px;
+  }
+}
+
+@media (max-width: 390px) {
+  .app-header .MuiChip-root {
+    display: none;
+  }
+
+  .keypad {
+    gap: 8px;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .MuiButton-root,
+  .MuiIconButton-root {
+    transition: transform 120ms ease, background-color 120ms ease !important;
+  }
+
+  .MuiButton-root:active,
+  .MuiIconButton-root:active {
+    transform: scale(0.96);
+  }
+}
