@@ -1,0 +1,64 @@
+name: Publish GitHub release
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: Successful native-build workflow run ID
+        required: true
+        type: string
+      tag:
+        description: Existing version tag to publish
+        required: true
+        type: string
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  release:
+    name: Publish ${{ inputs.tag }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download native build artifacts
+        uses: actions/download-artifact@v8
+        with:
+          run-id: ${{ inputs.run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: release-assets
+
+      - name: Verify and publish release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ inputs.tag }}
+        shell: bash
+        run: |
+          mapfile -d '' assets < <(
+            find release-assets -type f \
+              \( -name '*.exe' -o -name '*.zip' -o -name '*.dmg' \
+                 -o -name '*.AppImage' -o -name '*.deb' -o -name '*.rpm' \
+                 -o -name '*.apk' \) -print0
+          )
+
+          if [[ ${#assets[@]} -ne 10 ]]; then
+            printf 'Expected 10 release files, found %s:\n' "${#assets[@]}"
+            printf '  %s\n' "${assets[@]}"
+            exit 1
+          fi
+
+          cat > release-notes.md <<EOF
+          Moscovium Calculator $RELEASE_TAG is available for Windows, macOS, Linux, and Android.
+
+          Downloads include:
+          - Windows installer and portable ZIP
+          - macOS DMG and ZIP for Intel and Apple Silicon
+          - Linux AppImage, RPM, and DEB
+          - Android APK
+          EOF
+
+          gh release create "$RELEASE_TAG" "${assets[@]}" \
+            --repo "$GITHUB_REPOSITORY" \
+            --verify-tag \
+            --title "Moscovium Calculator $RELEASE_TAG" \
+            --notes-file release-notes.md
