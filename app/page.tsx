@@ -3,16 +3,37 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   BackspaceRounded,
+  BoltRounded,
+  CalendarMonthRounded,
   CalculateRounded,
+  CodeRounded,
+  CompressRounded,
+  CurrencyExchangeRounded,
+  DataUsageRounded,
   DeleteSweepRounded,
+  DeviceThermostatRounded,
+  GridOnRounded,
   HistoryRounded,
+  MenuRounded,
+  ScaleRounded,
+  ScheduleRounded,
+  ScienceRounded,
+  ShowChartRounded,
+  SpeedRounded,
+  StraightenRounded,
+  SwapHorizRounded,
 } from "@mui/icons-material";
 import {
   Box,
   Button,
-  Chip,
   CssBaseline,
+  Divider,
+  Drawer,
   IconButton,
+  List,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
   Paper,
   Stack,
   ThemeProvider,
@@ -21,9 +42,18 @@ import {
   createTheme,
   useMediaQuery,
 } from "@mui/material";
+import { AdvancedMode, type CalculatorMode } from "./advanced-modes";
 
 type Operator = "+" | "−" | "×" | "÷";
 type HistoryItem = { expression: string; result: string };
+
+declare global {
+  interface Window {
+    desktopApi?: {
+      setWindowLayout: (layout: { mode: CalculatorMode; historyOpen: boolean }) => void;
+    };
+  }
+}
 
 const operators: Record<Operator, (a: number, b: number) => number> = {
   "+": (a, b) => a + b,
@@ -38,6 +68,31 @@ function formatResult(value: number) {
   const text = String(rounded);
   return text.length > 15 ? rounded.toExponential(8) : text;
 }
+
+const modeGroups: Array<{ label?: string; items: Array<{ id: CalculatorMode; label: string; icon: React.ReactNode }> }> = [
+  { items: [
+    { id: "standard", label: "Standard", icon: <CalculateRounded /> },
+    { id: "scientific", label: "Scientific", icon: <ScienceRounded /> },
+    { id: "graphing", label: "Graphing", icon: <ShowChartRounded /> },
+    { id: "programmer", label: "Programmer", icon: <CodeRounded /> },
+    { id: "date", label: "Date calculation", icon: <CalendarMonthRounded /> },
+  ] },
+  { label: "Converter", items: [
+    { id: "currency", label: "Currency", icon: <CurrencyExchangeRounded /> },
+    { id: "volume", label: "Volume", icon: <GridOnRounded /> },
+    { id: "length", label: "Length", icon: <StraightenRounded /> },
+    { id: "mass", label: "Weight and mass", icon: <ScaleRounded /> },
+    { id: "temperature", label: "Temperature", icon: <DeviceThermostatRounded /> },
+    { id: "energy", label: "Energy", icon: <BoltRounded /> },
+    { id: "area", label: "Area", icon: <GridOnRounded /> },
+    { id: "speed", label: "Speed", icon: <SpeedRounded /> },
+    { id: "time", label: "Time", icon: <ScheduleRounded /> },
+    { id: "power", label: "Power", icon: <BoltRounded /> },
+    { id: "data", label: "Data", icon: <DataUsageRounded /> },
+    { id: "pressure", label: "Pressure", icon: <CompressRounded /> },
+    { id: "angle", label: "Angle", icon: <SwapHorizRounded /> },
+  ] },
+];
 
 export default function Home() {
   const prefersDark = useMediaQuery("(prefers-color-scheme: dark)");
@@ -73,6 +128,10 @@ export default function Home() {
   const [waiting, setWaiting] = useState(false);
   const [formula, setFormula] = useState("");
   const [history, setHistory] = useState<HistoryItem[]>([]);
+  const [historyOpen, setHistoryOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [mode, setMode] = useState<CalculatorMode>("standard");
+  const [memory, setMemory] = useState<number | null>(null);
 
   const clear = useCallback(() => {
     setDisplay("0");
@@ -171,6 +230,7 @@ export default function Home() {
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
+      if (mode !== "standard") return;
       if (/^[0-9]$/.test(event.key)) inputDigit(event.key);
       else if (event.key === "." || event.key === ",") inputDecimal();
       else if (event.key === "+") chooseOperator("+");
@@ -186,51 +246,100 @@ export default function Home() {
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [backspace, chooseOperator, clear, equals, inputDecimal, inputDigit, percent]);
+  }, [backspace, chooseOperator, clear, equals, inputDecimal, inputDigit, mode, percent]);
 
   const buttonSx = {
     minWidth: 0,
-    height: { xs: 62, sm: 68 },
-    borderRadius: "18px",
-    fontSize: "1.15rem",
+    height: 50,
+    borderRadius: "13px",
+    fontSize: "1rem",
+  };
+
+  const toggleHistory = () => {
+    setHistoryOpen((open) => {
+      const next = !open;
+      window.desktopApi?.setWindowLayout({ mode, historyOpen: next });
+      return next;
+    });
+  };
+
+  const selectMode = (nextMode: CalculatorMode) => {
+    setMode(nextMode);
+    setMenuOpen(false);
+    setHistoryOpen(false);
+    window.desktopApi?.setWindowLayout({ mode: nextMode, historyOpen: false });
   };
 
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Box component="main" className="app-shell">
-        <Stack className="app-header" direction="row" alignItems="center" justifyContent="space-between">
-          <Stack direction="row" spacing={1.4} alignItems="center">
-            <Box className="element-mark" aria-hidden="true">
-              <span>115</span>
-              <strong>Mc</strong>
-            </Box>
-            <Box>
-              <Typography variant="h6" fontWeight={750} lineHeight={1.1}>
-                Moscovium
-              </Typography>
-              <Typography variant="caption" color="text.secondary">
-                Material calculator
-              </Typography>
-            </Box>
-          </Stack>
-          <Chip
-            size="small"
-            label={`System · ${prefersDark ? "Dark" : "Light"}`}
-            sx={{ bgcolor: "action.hover", fontWeight: 650 }}
-          />
-        </Stack>
+        <Drawer open={menuOpen} onClose={() => setMenuOpen(false)} className="mode-drawer">
+          <Box className="drawer-content" role="navigation" aria-label="Calculator modes">
+            <Typography variant="subtitle2" className="drawer-title">Calculator</Typography>
+            {modeGroups.map((group, groupIndex) => (
+              <Box key={group.label ?? "calculators"}>
+                {groupIndex > 0 && <Divider />}
+                {group.label && <Typography variant="caption" className="drawer-section">{group.label}</Typography>}
+                <List dense disablePadding>
+                  {group.items.map((item) => (
+                    <ListItemButton key={item.id} selected={mode === item.id} onClick={() => selectMode(item.id)}>
+                      <ListItemIcon>{item.icon}</ListItemIcon>
+                      <ListItemText primary={item.label} />
+                    </ListItemButton>
+                  ))}
+                </List>
+              </Box>
+            ))}
+          </Box>
+        </Drawer>
 
-        <Box className="workspace">
+        <Box className={`workspace mode-${mode}${historyOpen ? " history-open" : ""}`}>
           <Paper className="calculator" elevation={0}>
-            <Box className="display" aria-live="polite" aria-atomic="true">
+            <Stack className="calculator-toolbar" direction="row" sx={{ justifyContent: "space-between", alignItems: "center" }}>
+              <Tooltip title="Calculator modes">
+                <IconButton size="small" onClick={() => setMenuOpen(true)} aria-label="Open calculator modes">
+                  <MenuRounded fontSize="small" />
+                </IconButton>
+              </Tooltip>
+              <Stack direction="row" spacing={0.5}>
+                <Tooltip title={historyOpen ? "Hide history" : "Show history"}>
+                  <IconButton
+                    size="small"
+                    color={historyOpen ? "primary" : "default"}
+                    onClick={toggleHistory}
+                    aria-label={historyOpen ? "Hide history" : "Show history"}
+                    aria-pressed={historyOpen}
+                  >
+                    <HistoryRounded fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="Delete last digit">
+                  <span>
+                    <IconButton size="small" onClick={backspace} disabled={mode !== "standard" || waiting} aria-label="Delete last digit">
+                      <BackspaceRounded fontSize="small" />
+                    </IconButton>
+                  </span>
+                </Tooltip>
+              </Stack>
+            </Stack>
+
+            {mode === "standard" ? <><Box className="display" aria-live="polite" aria-atomic="true">
               <Typography className="formula" color="text.secondary">
-                {formula || "Ready"}
+                {formula || "\u00a0"}
               </Typography>
               <Typography className="result" title={display}>
                 {display}
               </Typography>
             </Box>
+
+            <Stack className="memory-row" direction="row">
+              <Button disabled={memory === null} onClick={() => setMemory(null)}>MC</Button>
+              <Button disabled={memory === null} onClick={() => memory !== null && setDisplay(formatResult(memory))}>MR</Button>
+              <Button onClick={() => setMemory((value) => (value ?? 0) + (Number(display) || 0))}>M+</Button>
+              <Button onClick={() => setMemory((value) => (value ?? 0) - (Number(display) || 0))}>M−</Button>
+              <Button onClick={() => setMemory(Number(display) || 0)}>MS</Button>
+            </Stack>
 
             <Box className="keypad">
               <Button onClick={clear} sx={buttonSx} className="utility-key">
@@ -270,28 +379,12 @@ export default function Home() {
               <Button onClick={() => inputDigit("0")} sx={buttonSx} className="number-key zero-key">0</Button>
               <Button onClick={inputDecimal} sx={buttonSx} className="number-key">.</Button>
               <Button onClick={equals} variant="contained" color="primary" sx={buttonSx} className="equals-key" aria-label="Equals">=</Button>
-            </Box>
-
-            <Stack className="shortcut-row" direction="row" alignItems="center" justifyContent="space-between">
-              <Typography variant="caption" color="text.secondary">
-                Keyboard ready
-              </Typography>
-              <Tooltip title="Delete last digit">
-                <span>
-                  <IconButton size="small" onClick={backspace} disabled={waiting} aria-label="Delete last digit">
-                    <BackspaceRounded fontSize="small" />
-                  </IconButton>
-                </span>
-              </Tooltip>
-            </Stack>
+            </Box></> : <AdvancedMode mode={mode} />}
           </Paper>
 
-          <Paper className="history-panel" elevation={0} component="aside">
-            <Stack direction="row" alignItems="center" justifyContent="space-between">
-              <Stack direction="row" spacing={1} alignItems="center">
-                <HistoryRounded color="primary" />
-                <Typography variant="subtitle1" fontWeight={750}>History</Typography>
-              </Stack>
+          {historyOpen && <Paper className="history-panel" elevation={0} component="aside">
+            <Stack direction="row" sx={{ alignItems: "center", justifyContent: "space-between" }}>
+              <Typography variant="subtitle2" sx={{ fontWeight: 750 }}>History</Typography>
               <Tooltip title="Clear history">
                 <span>
                   <IconButton size="small" onClick={() => setHistory([])} disabled={!history.length} aria-label="Clear history">
@@ -302,7 +395,7 @@ export default function Home() {
             </Stack>
 
             {history.length ? (
-              <Stack spacing={1.2} mt={2}>
+              <Stack spacing={1.2} sx={{ mt: 2 }}>
                 {history.map((item, index) => (
                   <Button
                     key={`${item.expression}-${index}`}
@@ -319,14 +412,14 @@ export default function Home() {
                 ))}
               </Stack>
             ) : (
-              <Stack className="empty-history" alignItems="center" justifyContent="center" spacing={1.2}>
+              <Stack className="empty-history" spacing={1.2} sx={{ alignItems: "center", justifyContent: "center" }}>
                 <CalculateRounded />
-                <Typography variant="body2" color="text.secondary" textAlign="center">
+                <Typography variant="body2" color="text.secondary" sx={{ textAlign: "center" }}>
                   Your calculations will appear here.
                 </Typography>
               </Stack>
             )}
-          </Paper>
+          </Paper>}
         </Box>
       </Box>
     </ThemeProvider>

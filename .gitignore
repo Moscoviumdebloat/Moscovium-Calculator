@@ -36,6 +36,10 @@ yarn-error.log*
 .vercel
 
 /dist/
+/desktop/app-dist/
+/release/
 /.wrangler/
 /outputs/
 /work/
+/.openai/
+/tsconfig.tsbuildinfo

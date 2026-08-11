@@ -1,0 +1,73 @@
+{
+  "name": "moscovium-calculator",
+  "version": "2.2.0",
+  "description": "A native Material calculator that follows the operating system theme.",
+  "author": "Yabosen",
+  "license": "MIT",
+  "private": true,
+  "main": "electron.cjs",
+  "build": {
+    "appId": "com.yabosen.moscoviumcalculator",
+    "productName": "Moscovium Calculator",
+    "electronVersion": "43.3.0",
+    "artifactName": "Moscovium-Calculator-${version}-${os}-${arch}.${ext}",
+    "asar": true,
+    "directories": {
+      "output": "../release"
+    },
+    "extraResources": [
+      {
+        "from": "Calc.ico",
+        "to": "Calc.ico"
+      },
+      {
+        "from": "build/icons/256x256.png",
+        "to": "Calc.png"
+      }
+    ],
+    "files": [
+      "app-dist/**/*",
+      "Calc.ico",
+      "electron.cjs",
+      "preload.cjs",
+      "package.json"
+    ],
+    "win": {
+      "icon": "Calc.ico",
+      "target": [
+        "nsis",
+        "zip"
+      ]
+    },
+    "mac": {
+      "icon": "build/Calc.icns",
+      "category": "public.app-category.utilities",
+      "target": [
+        "dmg",
+        "zip"
+      ]
+    },
+    "linux": {
+      "icon": "build/icons",
+      "category": "Utility",
+      "synopsis": "Material calculator and unit converter",
+      "description": "A native Material calculator that follows the operating system theme.",
+      "target": [
+        "AppImage",
+        "deb",
+        "rpm"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "include": "installer.nsh",
+      "installerIcon": "Calc.ico",
+      "uninstallerIcon": "Calc.ico",
+      "installerHeaderIcon": "Calc.ico",
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": false,
+      "createStartMenuShortcut": false,
+      "shortcutName": "Moscovium Calculator"
+    }
+  }
+}

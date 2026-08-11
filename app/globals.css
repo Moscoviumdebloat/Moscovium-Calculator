@@ -3,13 +3,14 @@
 }
 
 html,
-body {
+body,
+#root {
   min-height: 100%;
   margin: 0;
 }
 
 body {
-  overflow-x: hidden;
+  overflow: hidden;
 }
 
 button,
@@ -18,81 +19,77 @@ input {
 }
 
 .app-shell {
+  display: grid;
   min-height: 100vh;
   min-height: 100svh;
-  padding: 24px;
-  background:
-    radial-gradient(circle at 15% 10%, color-mix(in srgb, var(--mui-palette-primary-main) 10%, transparent), transparent 28rem),
-    var(--mui-palette-background-default);
-}
-
-.app-header {
-  width: min(930px, 100%);
-  margin: 0 auto 24px;
-}
-
-.element-mark {
-  position: relative;
-  display: grid;
-  width: 50px;
-  height: 50px;
   place-items: center;
-  border-radius: 15px;
-  color: var(--mui-palette-primary-contrastText);
-  background: var(--mui-palette-primary-main);
-  box-shadow: 0 8px 22px color-mix(in srgb, var(--mui-palette-primary-main) 28%, transparent);
-}
-
-.element-mark span {
-  position: absolute;
-  top: 5px;
-  left: 8px;
-  font-size: 0.54rem;
-  font-weight: 700;
-  opacity: 0.78;
-}
-
-.element-mark strong {
-  margin-top: 6px;
-  font-size: 1.25rem;
-  letter-spacing: -0.04em;
+  padding: 0;
+  background: var(--mui-palette-background-default);
 }
 
 .workspace {
   display: grid;
-  grid-template-columns: minmax(0, 570px) minmax(235px, 285px);
-  gap: 22px;
-  width: min(880px, 100%);
-  margin: 0 auto;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
+  width: 100%;
+  min-height: 100svh;
+  margin: auto;
   align-items: stretch;
+}
+
+.workspace.history-open {
+  grid-template-columns: minmax(0, 1fr) 254px;
 }
 
 .calculator,
 .history-panel {
-  border: 1px solid var(--mui-palette-divider);
-  box-shadow: 0 20px 55px color-mix(in srgb, #000 10%, transparent) !important;
+  border: 0;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
 }
 
 .calculator {
-  padding: 20px;
-  border-radius: 30px !important;
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  flex-direction: column;
+  justify-content: center;
+  padding: 10px 12px 12px;
+}
+
+.calculator-toolbar {
+  min-height: 32px;
+}
+
+.memory-row {
+  margin-bottom: 6px;
+}
+
+.memory-row .MuiButton-root {
+  min-width: 0;
+  height: 26px;
+  flex: 1;
+  padding: 2px;
+  border-radius: 8px;
+  font-size: 0.68rem;
 }
 
 .display {
   display: flex;
-  min-height: 140px;
+  min-height: 90px;
   flex-direction: column;
   align-items: flex-end;
   justify-content: flex-end;
-  padding: 14px 10px 20px;
+  padding: 0 6px 10px;
   overflow: hidden;
 }
 
 .formula {
-  min-height: 24px;
+  min-height: 18px;
   max-width: 100%;
   overflow: hidden;
-  font-size: 0.95rem !important;
+  font-size: 0.76rem !important;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -100,9 +97,9 @@ input {
 .result {
   max-width: 100%;
   overflow: hidden;
-  font-size: clamp(2.8rem, 9vw, 4.5rem) !important;
+  font-size: clamp(2.35rem, 13vw, 3.6rem) !important;
   font-weight: 520 !important;
-  line-height: 1.08 !important;
+  line-height: 1.05 !important;
   letter-spacing: -0.055em !important;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -111,7 +108,7 @@ input {
 .keypad {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
+  gap: 6px;
 }
 
 .keypad .MuiButton-root {
@@ -131,7 +128,7 @@ input {
 .keypad .operator-key {
   color: var(--mui-palette-primary-main);
   background: color-mix(in srgb, var(--mui-palette-primary-main) 14%, transparent);
-  font-size: 1.45rem;
+  font-size: 1.2rem;
 }
 
 .keypad .equals-key,
@@ -144,92 +141,380 @@ input {
   grid-column: span 2;
 }
 
-.shortcut-row {
-  min-height: 40px;
-  padding: 10px 6px 0 10px;
-}
-
 .history-panel {
+  width: 100%;
   min-height: 100%;
-  padding: 20px;
-  border-radius: 28px !important;
+  padding: 12px;
+  border-left: 1px solid var(--mui-palette-divider);
 }
 
 .empty-history {
-  min-height: 360px;
-  padding: 24px;
+  min-height: 300px;
+  padding: 18px;
   color: var(--mui-palette-text-disabled);
 }
 
 .history-item {
   display: flex !important;
-  min-height: 70px;
+  min-height: 56px;
   flex-direction: column !important;
   align-items: flex-end !important;
-  padding: 11px 14px !important;
-  border-radius: 14px !important;
+  padding: 8px 10px !important;
+  border-radius: 11px !important;
   color: var(--mui-palette-text-primary) !important;
   background: var(--mui-palette-action-hover) !important;
 }
 
 .history-item span {
   color: var(--mui-palette-text-secondary);
-  font-size: 0.76rem;
+  font-size: 0.7rem;
   font-weight: 500;
 }
 
 .history-item strong {
   max-width: 100%;
   overflow: hidden;
-  font-size: 1.15rem;
+  font-size: 1rem;
   text-overflow: ellipsis;
 }
 
-@media (max-width: 720px) {
-  .app-shell {
-    padding: 16px 14px 28px;
+.mode-drawer .MuiDrawer-paper {
+  width: 280px;
+  border-right: 1px solid var(--mui-palette-divider);
+  background: var(--mui-palette-background-paper);
+}
+
+.drawer-content {
+  width: 280px;
+  min-height: 100%;
+  padding: 10px 8px 16px;
+  overflow-y: auto;
+}
+
+.drawer-title {
+  padding: 7px 10px 11px;
+}
+
+.drawer-section {
+  display: block;
+  padding: 13px 10px 6px;
+  color: var(--mui-palette-text-secondary);
+  font-weight: 700 !important;
+}
+
+.drawer-content .MuiDivider-root {
+  margin: 7px 5px 0;
+}
+
+.drawer-content .MuiListItemButton-root {
+  min-height: 39px;
+  margin: 2px 0;
+  padding: 5px 10px;
+  border-radius: 9px;
+}
+
+.drawer-content .MuiListItemButton-root.Mui-selected {
+  color: var(--mui-palette-primary-main);
+  background: color-mix(in srgb, var(--mui-palette-primary-main) 13%, transparent);
+}
+
+.drawer-content .MuiListItemIcon-root {
+  min-width: 34px;
+  color: inherit;
+}
+
+.drawer-content .MuiSvgIcon-root {
+  font-size: 1.1rem;
+}
+
+.drawer-content .MuiListItemText-primary {
+  font-size: 0.85rem;
+}
+
+.workspace:not(.mode-standard) .calculator {
+  justify-content: flex-start;
+}
+
+.mode-content {
+  min-height: 0;
+  flex: 1;
+  padding: 6px 4px 4px;
+}
+
+.advanced-display {
+  display: flex;
+  min-height: 92px;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: flex-end;
+  padding: 4px 8px 12px;
+}
+
+.advanced-expression {
+  max-width: 100%;
+  overflow: hidden;
+  font-size: 0.82rem !important;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.advanced-result {
+  max-width: 100%;
+  overflow: hidden;
+  font-size: 2.5rem !important;
+  font-weight: 600 !important;
+  line-height: 1.1 !important;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.scientific-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.mode-key,
+.primary-mode-key {
+  min-width: 0 !important;
+  height: 42px;
+  border-radius: 11px !important;
+  color: var(--mui-palette-text-primary) !important;
+  background: var(--mui-palette-action-hover) !important;
+}
+
+.primary-mode-key {
+  color: var(--mui-palette-primary-contrastText) !important;
+  background: var(--mui-palette-primary-main) !important;
+}
+
+.graphing-mode {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mode-controls {
+  padding: 4px;
+}
+
+.graph-canvas {
+  width: 100%;
+  min-height: 400px;
+  flex: 1;
+  border: 1px solid var(--mui-palette-divider);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--mui-palette-background-paper) 65%, transparent);
+}
+
+.programmer-value {
+  min-height: 68px;
+  padding: 12px 8px;
+  overflow: hidden;
+  font-size: 2.2rem !important;
+  font-weight: 600 !important;
+  text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.base-readout .MuiButton-root {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  min-height: 28px;
+  justify-items: start;
+  padding: 3px 9px;
+  color: var(--mui-palette-text-secondary);
+}
+
+.base-readout .MuiButton-root strong {
+  max-width: 100%;
+  overflow: hidden;
+  color: var(--mui-palette-text-primary);
+  text-overflow: ellipsis;
+}
+
+.base-readout .active-base {
+  color: var(--mui-palette-primary-main);
+  background: color-mix(in srgb, var(--mui-palette-primary-main) 10%, transparent);
+}
+
+.programmer-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.date-mode,
+.converter-mode {
+  padding: 8px 10px 12px;
+}
+
+.date-fields {
+  padding: 22px 4px 4px;
+}
+
+.date-result,
+.conversion-card,
+.conversion-result {
+  padding: 15px;
+  border: 1px solid var(--mui-palette-divider);
+  border-radius: 12px !important;
+  background: var(--mui-palette-action-hover) !important;
+}
+
+.conversion-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.conversion-result {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.conversion-result .MuiFormControl-root {
+  min-width: 115px;
+}
+
+.swap-button {
+  align-self: center;
+  min-width: 44px !important;
+  border-radius: 999px !important;
+}
+
+.currency-mode {
+  display: flex;
+  flex-direction: column;
+  padding: 6px 6px 4px;
+}
+
+.currency-mode > .MuiTypography-h5 {
+  margin: 1px 4px 3px;
+}
+
+.currency-amount-block {
+  padding: 2px 4px 5px;
+}
+
+.currency-number-line {
+  min-height: 55px;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.currency-symbol {
+  min-width: 24px;
+  color: var(--mui-palette-text-secondary);
+  font-size: 1.05rem !important;
+}
+
+.currency-number-line .MuiInputBase-input {
+  padding: 0 0 3px;
+  font-size: 2.35rem;
+  line-height: 1.1;
+}
+
+.currency-number-line .MuiInput-root::before,
+.currency-number-line .MuiInput-root::after {
+  display: none;
+}
+
+.currency-result {
+  max-width: calc(100% - 36px);
+  overflow: hidden;
+  font-size: 2.2rem !important;
+  font-weight: 400 !important;
+  line-height: 1.1 !important;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.currency-output {
+  margin-top: 2px;
+}
+
+.currency-amount-block > .MuiAutocomplete-root .MuiInputBase-root {
+  font-size: 0.8rem;
+}
+
+.rate-status {
+  min-height: 46px;
+  padding: 2px 4px;
+}
+
+.rate-status .MuiTypography-root {
+  line-height: 1.25;
+}
+
+.currency-actions {
+  margin: 2px 0 5px;
+}
+
+.currency-actions .MuiButton-root,
+.currency-keypad .MuiButton-root {
+  min-width: 0;
+  height: 43px;
+  border-radius: 9px;
+  color: var(--mui-palette-text-primary);
+  background: var(--mui-palette-action-hover);
+}
+
+.currency-keypad {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 5px;
+}
+
+.currency-keypad .MuiButton-root {
+  height: 48px;
+  font-size: 1rem;
+}
+
+.currency-zero {
+  grid-column: span 2;
+}
+
+@media (max-width: 580px) {
+  body {
+    overflow-y: auto;
   }
 
-  .app-header {
-    margin-bottom: 16px;
-  }
-
-  .workspace {
-    grid-template-columns: 1fr;
-  }
-
-  .calculator {
-    padding: 14px;
-    border-radius: 26px !important;
-  }
-
-  .display {
-    min-height: 128px;
+  .workspace.history-open {
+    grid-template-columns: minmax(0, 328px);
   }
 
   .history-panel {
-    min-height: auto;
+    width: 328px;
+    border-top: 1px solid var(--mui-palette-divider);
+    border-left: 0;
   }
 
   .empty-history {
-    min-height: 120px;
+    min-height: 110px;
   }
 }
 
-@media (max-width: 390px) {
-  .app-header .MuiChip-root {
-    display: none;
+@media (max-width: 350px) {
+  .calculator,
+  .history-panel {
+    width: 100%;
   }
 
-  .keypad {
-    gap: 8px;
+  .workspace,
+  .workspace.history-open {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
 @media (prefers-reduced-motion: no-preference) {
   .MuiButton-root,
   .MuiIconButton-root {
-    transition: transform 120ms ease, background-color 120ms ease !important;
+    transition: transform 100ms ease, background-color 100ms ease !important;
   }
 
   .MuiButton-root:active,

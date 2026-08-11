@@ -10,9 +10,15 @@ import tseslint from "typescript-eslint";
 const eslintConfig = defineConfig([
   globalIgnores([
     ".next/**",
+    ".vinext/**",
+    ".wrangler/**",
+    "android/app/src/main/assets/public/**",
+    "desktop/app-dist/**",
     "dist/**",
     "out/**",
     "build/**",
+    "release/**",
+    "work/**",
     "next-env.d.ts",
   ]),
   eslint.configs.recommended,
@@ -34,6 +40,12 @@ const eslintConfig = defineConfig([
       react: {
         version: "detect",
       },
+    },
+  },
+  {
+    files: ["desktop/**/*.cjs"],
+    rules: {
+      "@typescript-eslint/no-require-imports": "off",
     },
   },
 ]);
