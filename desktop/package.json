@@ -2,7 +2,16 @@
   "name": "moscovium-calculator",
   "version": "2.2.0",
   "description": "A native Material calculator that follows the operating system theme.",
-  "author": "Yabosen",
+  "author": {
+    "name": "Yabosen",
+    "email": "moscoviumdebloat@users.noreply.github.com"
+  },
+  "homepage": "https://github.com/Moscoviumdebloat/Moscovium-Calculator",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Moscoviumdebloat/Moscovium-Calculator.git"
+  },
+  "desktopName": "com.yabosen.moscoviumcalculator.desktop",
   "license": "MIT",
   "private": true,
   "main": "electron.cjs",
@@ -50,6 +59,10 @@
     "linux": {
       "icon": "build/icons",
       "category": "Utility",
+      "maintainer": "Yabosen <moscoviumdebloat@users.noreply.github.com>",
+      "vendor": "Moscovium",
+      "executableName": "moscovium-calculator",
+      "syncDesktopName": true,
       "synopsis": "Material calculator and unit converter",
       "description": "A native Material calculator that follows the operating system theme.",
       "target": [

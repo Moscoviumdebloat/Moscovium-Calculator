@@ -75,8 +75,21 @@ jobs:
           if-no-files-found: error
 
   linux:
-    name: Linux AppImage, RPM, and DEB
+    name: Linux ${{ matrix.target }}
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: AppImage
+            extension: AppImage
+            artifact: linux-appimage-x64
+          - target: deb
+            extension: deb
+            artifact: linux-deb-x64
+          - target: rpm
+            extension: rpm
+            artifact: linux-rpm-x64
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
@@ -92,15 +105,12 @@ jobs:
           sudo apt-get update
           sudo apt-get install --no-install-recommends -y libopenjp2-tools rpm
       - run: npm run desktop:renderer
-      - name: Build Linux packages
-        run: npx electron-builder --project desktop --linux AppImage deb rpm --x64 --publish never
+      - name: Build Linux ${{ matrix.target }} package
+        run: npx electron-builder --project desktop --linux ${{ matrix.target }} --x64 --publish never
       - uses: actions/upload-artifact@v7
         with:
-          name: linux-x64
-          path: |
-            release/*.AppImage
-            release/*.deb
-            release/*.rpm
+          name: ${{ matrix.artifact }}
+          path: release/*.${{ matrix.extension }}
           if-no-files-found: error
 
   android:
