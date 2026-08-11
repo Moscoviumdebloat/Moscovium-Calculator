@@ -16,7 +16,8 @@ permissions:
   contents: read
 
 env:
-  NODE_VERSION: "24"
+  NODE_VERSION: "22.22.0"
+  NPM_VERSION: "10.9.4"
 
 jobs:
   windows:
@@ -28,7 +29,10 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
-      - run: npm ci
+      - name: Use stable npm
+        run: npm install --global "npm@${{ env.NPM_VERSION }}"
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
       - run: npm run desktop:renderer
       - name: Build installer and portable ZIP
         run: npx electron-builder --project desktop --win nsis zip --x64 --publish never
@@ -55,7 +59,10 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
-      - run: npm ci
+      - name: Use stable npm
+        run: npm install --global "npm@${{ env.NPM_VERSION }}"
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
       - run: npm run desktop:renderer
       - name: Build macOS app
         run: npx electron-builder --project desktop --mac dmg zip --${{ matrix.arch }} --publish never
@@ -76,7 +83,10 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
-      - run: npm ci
+      - name: Use stable npm
+        run: npm install --global "npm@${{ env.NPM_VERSION }}"
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
       - name: Install Linux packaging tools
         run: |
           sudo apt-get update
@@ -107,9 +117,14 @@ jobs:
           distribution: temurin
           java-version: "21"
           cache: gradle
-      - name: Install Android SDK packages
-        run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
-      - run: npm ci
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v4
+        with:
+          packages: "platform-tools platforms;android-36 build-tools;36.0.0"
+      - name: Use stable npm
+        run: npm install --global "npm@${{ env.NPM_VERSION }}"
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
       - run: npm run android:sync
       - name: Build installable APK
         working-directory: android
